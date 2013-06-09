@@ -31,25 +31,30 @@ namespace Arduino_PC_Monitor
 
         private void Form1_Load(object sender, EventArgs e)
         {
-              if (!IsProcessOpen("Core Temp"))
-              {
-                  Process p = Process.Start("Core Temp.exe");          
-              }
+            this.SetStyle(
+                System.Windows.Forms.ControlStyles.UserPaint |
+                System.Windows.Forms.ControlStyles.AllPaintingInWmPaint |
+                System.Windows.Forms.ControlStyles.OptimizedDoubleBuffer,
+                true);
+            if (!IsProcessOpen("Core Temp"))
+            {
+                Process p = Process.Start("Core Temp.exe");
+            }
 
-              if (!IsProcessOpen("GPU-Z"))
-              {
-                  Process p = Process.Start("GPU-Z.0.7.1.exe");
-              }
+            if (!IsProcessOpen("GPU-Z"))
+            {
+                Process p = Process.Start("GPU-Z.0.7.1.exe");
+            }
 
-              Thread.Sleep(5000);
+            Thread.Sleep(5000);
 
-              CTInfo = new CoreTempInfo();        
+            CTInfo = new CoreTempInfo();
 
-              gpuz = new GpuzWrapper();
-              gpuz.Open();
+            gpuz = new GpuzWrapper();
+            gpuz.Open();
 
-              port = new SerialPort("COM3", 9600, Parity.None, 8, StopBits.One);
-              button1.PerformClick();
+            port = new SerialPort("COM3", 9600, Parity.None, 8, StopBits.One);
+            button1.PerformClick();
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -57,7 +62,7 @@ namespace Arduino_PC_Monitor
             if (!port.IsOpen)
             {
                 button1.Text = "Stop";
-                timer1.Enabled = true;              
+                timer1.Enabled = true;
                 label1.Text = "Started";
                 label1.ForeColor = Color.Green;
 
@@ -66,7 +71,7 @@ namespace Arduino_PC_Monitor
             else
             {
                 button1.Text = "Start";
-                timer1.Enabled = false;              
+                timer1.Enabled = false;
                 label3.Text = "0";
                 label1.Text = "Not started";
                 label1.ForeColor = Color.Black;
@@ -87,27 +92,27 @@ namespace Arduino_PC_Monitor
                 port.Write("r");
                 int cpuusage = (int)Math.Round(performanceCounter1.NextValue(), 0);
                 int gpuusage = (int)Math.Round(gpuz.GetUsage(), 0);
-                
-                string usage = cpuusage + "," + gpuusage  + "%";
-               
+
+                string usage = cpuusage + "," + gpuusage + "%";
+
                 port.Write(usage);
 
                 int UsedRam = GetUsedRam();
-                
+
                 string ram = UsedRam + "Mb";
                 for (int i = 1; i <= 16 - usage.Length - ram.Length; i++)
                     port.Write(" ");
                 port.Write(ram);
                 port.Write("n");
                 int kbs = (int)Math.Round(performanceCounter3.NextValue() / 1024f, 0);
-              
+
                 string kbsec = kbs + "Kb";
                 totalbytes += performanceCounter3.NextValue();
                 port.Write(kbsec);
-                int cputemp = (int)Math.Round(CTInfo.GetTemp[0],0);
+                int cputemp = (int)Math.Round(CTInfo.GetTemp[0], 0);
                 int gputemp = (int)Math.Round(gpuz.GetTemp(), 0);
                 string temp = " " + cputemp + "," + gputemp + "C";
-                
+
                 port.Write(temp);
                 string totalmega = Math.Round((totalbytes / 1024f) / 1024f, 0).ToString() + "Mb";
                 for (int i = 1; i <= 16 - temp.Length - kbsec.Length - totalmega.Length; i++)
@@ -116,7 +121,7 @@ namespace Arduino_PC_Monitor
 
                 CPUusage_Graph.AddValue(cpuusage);
                 GPUusage_Graph.AddValue(gpuusage);
-               
+
                 if (UsedRam > RamUsed_Graph.highest)
                 {
                     RamUsed_Graph.highest = UsedRam;
@@ -176,6 +181,6 @@ namespace Arduino_PC_Monitor
             GPUtemp_Graph = new Graph(panel4, 0, -1, -1);
             Downloadspeed_Graph = new Graph(panel5, 0, -1, -1);
             RamUsed_Graph = new Graph(panel6, 0, -1, -1);
-        }
+        }     
     }
 }

@@ -15,16 +15,38 @@ namespace Arduino_PC_Monitor
         public int highest;
         Point startPoint;
         List<int> Values = new List<int>();
-        Graphics g;
+      
         public Graph(Panel p, int lowest, int mid, int highest)
         {
+            p.Paint += new System.Windows.Forms.PaintEventHandler(Paint);
             this.p = p;
             this.lowest = lowest;
             this.mid = mid;
             this.highest = highest;
-            this.startPoint = GetPixelByPercentage(p, 5, 75);
-            g = p.CreateGraphics();
-            DrawGrid();
+            this.startPoint = GetPixelByPercentage(p, 5, 75);           
+            DrawGrid(p.CreateGraphics());
+        }
+
+        private void Paint(object sender, PaintEventArgs e)
+        {
+            DrawGrid(e.Graphics);
+
+            Point lastpoint = startPoint;
+            int X = startPoint.X;
+
+            for (int i = 0; i < Values.Count; i++)
+            {
+                int Value = Values[i];
+                int percentage = (int)Math.Round((double)100 * (highest - Value) / highest, 0);
+                Point point = new Point(X, GetPixelByPercentage(p, 0, percentage, p.Width - startPoint.X, p.Height - (p.Height - startPoint.Y)).Y);
+                if (i != 0)
+                    e.Graphics.DrawLine(new Pen(Color.Gray, (float)1.5), lastpoint, point);
+                lastpoint = point;
+                X += 3;
+            }
+
+            X = startPoint.X;
+            lastpoint = startPoint;
         }
 
         public void UpdateValues(int lowest, int mid, int highest)
@@ -34,7 +56,7 @@ namespace Arduino_PC_Monitor
             this.highest = highest;
         }
 
-        void DrawGrid()
+        void DrawGrid(Graphics g)
         {
             SolidBrush br = new SolidBrush(Color.Black);
             Font f = new Font("Tahoma", 5);
@@ -71,29 +93,6 @@ namespace Arduino_PC_Monitor
                 return new Point((int)Math.Round((double)width * widthPercentage / 100, 0), (int)Math.Round((double)height * heightPercentage / 100, 0));
         }
     
-        public void Update()
-        {
-            p.Refresh();
-            DrawGrid();
-
-            Point lastpoint = startPoint;
-            int X = startPoint.X;        
-
-            for (int i = 0; i < Values.Count; i++)
-            {
-                int Value = Values[i];
-                int percentage = (int)Math.Round((double)100 * (highest - Value) / highest, 0);                      
-                Point point = new Point(X, GetPixelByPercentage(p, 0, percentage, p.Width - startPoint.X, p.Height - (p.Height - startPoint.Y)).Y);
-                if (i != 0)
-                    g.DrawLine(new Pen(Color.Gray,(float)1.5), lastpoint, point);
-                lastpoint = point;
-                X += 3;
-            }
-
-            X = startPoint.X;
-            lastpoint = startPoint;
-        }
-
         public void AddValue(int value)
         {
             Values.Add(value);
@@ -107,7 +106,7 @@ namespace Arduino_PC_Monitor
                 }
             }
 
-            Update();
+            p.Refresh();
         }
     }
 }
