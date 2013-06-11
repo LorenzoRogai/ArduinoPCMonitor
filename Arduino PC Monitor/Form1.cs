@@ -15,11 +15,7 @@ using System.Threading;
 namespace Arduino_PC_Monitor
 {
     public partial class Form1 : Form
-    {
-        private const int SW_RESTORE = 9;
-
-        [DllImport("user32.dll")]
-        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+    {      
         SerialPort port;
         static CoreTempInfo CTInfo;
         GpuzWrapper gpuz;
@@ -183,19 +179,7 @@ namespace Arduino_PC_Monitor
             }
             return false;
         }
-
-        public Process GetProcess(string name)
-        {
-            foreach (Process clsProcess in Process.GetProcesses())
-            {
-                if (clsProcess.ProcessName.Contains(name))
-                {
-                    return clsProcess;
-                }
-            }
-            return null;
-        }
-
+        
         private void Form1_Shown(object sender, EventArgs e)
         {
             CPUusage_Graph = new Graph(panel1, 0, 50, 100);
