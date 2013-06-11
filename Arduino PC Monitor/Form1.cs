@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.IO.Ports;
+using System.Runtime.InteropServices;
 using GetCoreTempInfoNET;
 using System.Diagnostics;
 using System.Threading;
@@ -15,6 +16,10 @@ namespace Arduino_PC_Monitor
 {
     public partial class Form1 : Form
     {
+        private const int SW_RESTORE = 9;
+
+        [DllImport("user32.dll")]
+        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
         SerialPort port;
         static CoreTempInfo CTInfo;
         GpuzWrapper gpuz;
@@ -38,12 +43,18 @@ namespace Arduino_PC_Monitor
                 true);
             if (!IsProcessOpen("Core Temp"))
             {
-                Process p = Process.Start("Core Temp.exe");
+                ProcessStartInfo startInfo = new ProcessStartInfo("Core Temp.exe");
+                startInfo.WindowStyle = ProcessWindowStyle.Minimized;
+
+                Process.Start(startInfo);
             }
 
             if (!IsProcessOpen("GPU-Z"))
             {
-                Process p = Process.Start("GPU-Z.0.7.1.exe");
+                ProcessStartInfo startInfo = new ProcessStartInfo("GPU-Z.0.7.1.exe");
+                startInfo.Arguments = "-minimized";
+
+                Process.Start(startInfo); 
             }
 
             Thread.Sleep(5000);
@@ -173,6 +184,18 @@ namespace Arduino_PC_Monitor
             return false;
         }
 
+        public Process GetProcess(string name)
+        {
+            foreach (Process clsProcess in Process.GetProcesses())
+            {
+                if (clsProcess.ProcessName.Contains(name))
+                {
+                    return clsProcess;
+                }
+            }
+            return null;
+        }
+
         private void Form1_Shown(object sender, EventArgs e)
         {
             CPUusage_Graph = new Graph(panel1, 0, 50, 100);
@@ -181,6 +204,6 @@ namespace Arduino_PC_Monitor
             GPUtemp_Graph = new Graph(panel4, 0, -1, -1);
             Downloadspeed_Graph = new Graph(panel5, 0, -1, -1);
             RamUsed_Graph = new Graph(panel6, 0, -1, -1);
-        }     
+        }
     }
 }

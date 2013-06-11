@@ -8,33 +8,31 @@ int backlightValue = 255;
 int fadeAmount = 5;
 char incomingChar; 
 
-int idle = 0;
+int charsRead = 0;
 
 void setup() {  
   lcd.begin(16, 2);
   Serial.begin(9600);  
   pinMode(backlightPin,OUTPUT);
   pinMode(buttonPin,INPUT);
-  digitalWrite(backlightPin,HIGH);
-  lcd.write("-----NODATA-----");
+  digitalWrite(backlightPin,HIGH); 
 }
 
 void loop() {
   if (digitalRead(buttonPin) == HIGH)
   {
+    charsRead = 0;
     if (backlightValue==255)
     {
       backlightValue = fadeAmount;
     }
     else
       backlightValue += fadeAmount;
-  
-    analogWrite(backlightPin,backlightValue);
-    delay(50);
+
+    analogWrite(backlightPin,backlightValue);   
   }
 
-  if (Serial.available() > 0) {
-    idle = 1;
+  if (Serial.available() > 0) {     
     // read the incoming byte:
     incomingChar = Serial.read();
     if(incomingChar == 'r')   {
@@ -46,16 +44,26 @@ void loop() {
     }   
     else 
       lcd.print(incomingChar);  
+
+    charsRead++;
+    if (charsRead==34)
+    {
+      delay(1000);
+      charsRead=0;
+    }
   }
   else
-  {   
-    if (idle == 0)
-    {
-      lcd.write("-----NODATA-----");    
-      idle = 1;
-    }    
+  {        
+    charsRead = 0;
+    lcd.clear();
+    lcd.write("-----NODATA-----");  
+    delay(1000);
   }
+
 }
+
+
+
 
 
 
