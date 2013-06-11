@@ -29,3 +29,4 @@ C:\Users\Lorenzo\Documents\GitHub\Arduino-PC-Monitor\Arduino PC Monitor\obj\x86\
 C:\Users\Lorenzo\Documents\GitHub\Arduino-PC-Monitor\Arduino PC Monitor\obj\x86\Debug\Arduino PC Monitor.csproj.GenerateResource.Cache
 C:\Users\Lorenzo\Documents\GitHub\Arduino-PC-Monitor\Arduino PC Monitor\obj\x86\Debug\Arduino PC Monitor.exe
 C:\Users\Lorenzo\Documents\GitHub\Arduino-PC-Monitor\Arduino PC Monitor\obj\x86\Debug\Arduino PC Monitor.pdb
+C:\Users\Lorenzo\Documents\GitHub\Arduino-PC-Monitor\Arduino PC Monitor\obj\x86\Debug\Arduino PC Monitor.csprojResolveAssemblyReference.cache
