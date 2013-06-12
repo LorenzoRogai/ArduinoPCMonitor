@@ -1,5 +1,4 @@
 #include <LiquidCrystal.h>
-#include <DateTime.h>
 
 LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 int buttonPin = 6;
@@ -8,7 +7,7 @@ int backlightValue = 255;
 int fadeAmount = 5;
 char incomingChar; 
 
-int charsRead = 0;
+int idle = 0;
 
 void setup() {  
   lcd.begin(16, 2);
@@ -16,12 +15,12 @@ void setup() {
   pinMode(backlightPin,OUTPUT);
   pinMode(buttonPin,INPUT);
   digitalWrite(backlightPin,HIGH); 
+  lcd.write("-----NODATA-----");  
 }
 
 void loop() {
   if (digitalRead(buttonPin) == HIGH)
-  {
-    charsRead = 0;
+  {    
     if (backlightValue==255)
     {
       backlightValue = fadeAmount;
@@ -29,10 +28,12 @@ void loop() {
     else
       backlightValue += fadeAmount;
 
-    analogWrite(backlightPin,backlightValue);   
+    analogWrite(backlightPin,backlightValue);
+    delay(50);
   }
 
-  if (Serial.available() > 0) {     
+  if (Serial.available() > 0) {   
+    idle = 1;  
     // read the incoming byte:
     incomingChar = Serial.read();
     if(incomingChar == 'r')   {
@@ -44,23 +45,19 @@ void loop() {
     }   
     else 
       lcd.print(incomingChar);  
-
-    charsRead++;
-    if (charsRead==34)
-    {
-      delay(1000);
-      charsRead=0;
-    }
   }
   else
   {        
-    charsRead = 0;
-    lcd.clear();
-    lcd.write("-----NODATA-----");  
-    delay(1000);
+    if(idle==0)
+    {    
+      lcd.write("-----NODATA-----");  
+      idle=1;
+    }
   }
 
 }
+
+
 
 
 
